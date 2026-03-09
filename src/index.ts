@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import llmRoutes from './llmRoutes';
+import playwrightRoutes from './playwrightRoutes';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api', llmRoutes);
+app.use('/api/playwright', playwrightRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

@@ -1,13 +1,30 @@
-import { useState, useRef } from 'react'
-import { Settings, Send, Bot, FileJson, CheckCircle, Loader2, ArrowLeft, Cpu, Globe, Key, Database, LayoutDashboard, Sparkles, Image as ImageIcon, X, Download } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Settings, Send, Bot, FileJson, CheckCircle, Loader2, ArrowLeft, Cpu, Globe, Key, Database, LayoutDashboard, Sparkles, Image as ImageIcon, X, Download, Play, Square, Code, RefreshCw, Crosshair } from 'lucide-react'
 import axios from 'axios'
 import ReactMarkdown from 'react-markdown'
 import * as XLSX from 'xlsx'
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx'
 import { saveAs } from 'file-saver'
 
-type View = 'dashboard' | 'settings';
+type View = 'dashboard' | 'settings' | 'recorder';
 type Tab = 'input' | 'output';
+
+// Types for Playwright integration
+interface DiscoveredLocator {
+  tag: string;
+  selectorType: string;
+  locator: string;
+  text: string;
+  url: string;
+}
+
+interface RecordedAction {
+  type: string;
+  target?: string;
+  value?: string;
+  timestamp: number;
+  url: string;
+}
 
 function App() {
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -29,6 +46,90 @@ function App() {
   const [error, setError] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Playwright Recorder State
+  const [targetUrl, setTargetUrl] = useState('https://demo.playwright.dev/todomvc/');
+  const [isLaunching, setIsLaunching] = useState(false);
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [isStopping, setIsStopping] = useState(false);
+  const [isGeneratingTest, setIsGeneratingTest] = useState(false);
+  const [locators, setLocators] = useState<DiscoveredLocator[]>([]);
+  const [actions, setActions] = useState<RecordedAction[]>([]);
+  const [generatedTestCode, setGeneratedTestCode] = useState('');
+  const [recorderError, setRecorderError] = useState('');
+  const [testName, setTestName] = useState('Recorded Navigation Test');
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Poll for locators while recording
+  const pollLocators = useCallback(async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/api/playwright/locators');
+      setLocators(res.data.locators);
+      setActions(res.data.actions);
+    } catch { /* session may have ended */ }
+  }, []);
+
+  useEffect(() => {
+    if (isSessionActive) {
+      pollIntervalRef.current = setInterval(pollLocators, 3000);
+    }
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+    };
+  }, [isSessionActive, pollLocators]);
+
+  const handleLaunchBrowser = async () => {
+    if (!targetUrl.trim()) return;
+    setIsLaunching(true);
+    setRecorderError('');
+    setGeneratedTestCode('');
+    setLocators([]);
+    setActions([]);
+    try {
+      const res = await axios.post('http://localhost:3000/api/playwright/launch', { url: targetUrl });
+      setIsSessionActive(true);
+      setLocators([]);
+      console.log('Browser launched:', res.data);
+    } catch (err: any) {
+      setRecorderError(err.response?.data?.error || err.message || 'Failed to launch browser');
+    } finally {
+      setIsLaunching(false);
+    }
+  };
+
+  const handleStopRecording = async () => {
+    setIsStopping(true);
+    try {
+      const res = await axios.post('http://localhost:3000/api/playwright/stop');
+      setLocators(res.data.locators);
+      setActions(res.data.actions);
+      setIsSessionActive(false);
+    } catch (err: any) {
+      setRecorderError(err.response?.data?.error || err.message);
+    } finally {
+      setIsStopping(false);
+    }
+  };
+
+  const handleGenerateTest = async () => {
+    setIsGeneratingTest(true);
+    setRecorderError('');
+    try {
+      const res = await axios.post('http://localhost:3000/api/playwright/generate-test', { testName });
+      setGeneratedTestCode(res.data.testCode);
+    } catch (err: any) {
+      setRecorderError(err.response?.data?.error || err.message);
+    } finally {
+      setIsGeneratingTest(false);
+    }
+  };
+
+  const downloadTestFile = () => {
+    if (!generatedTestCode) return;
+    const blob = new Blob([generatedTestCode], { type: 'text/typescript' });
+    const filename = `${testName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}.spec.ts`;
+    saveAs(blob, filename);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -189,6 +290,16 @@ function App() {
             >
               <Settings size={20} />
               <span className="hidden lg:block font-medium">Settings</span>
+            </button>
+            <button
+              onClick={() => setActiveView('recorder')}
+              className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 lg:px-4 rounded-xl transition-all duration-200 ${activeView === 'recorder'
+                ? 'bg-emerald-500/15 text-emerald-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] border border-emerald-500/20'
+                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                }`}
+            >
+              <Play size={20} />
+              <span className="hidden lg:block font-medium">Recorder</span>
             </button>
           </nav>
         </div>
@@ -402,7 +513,7 @@ function App() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeView === 'settings' ? (
           /* Settings View */
           <div className="h-full flex flex-col p-6 lg:p-10 max-w-4xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             <header className="mb-8">
@@ -516,6 +627,196 @@ function App() {
                 </div>
               </div>
             </div>
+          </div>
+        ) : (
+          /* Recorder View */
+          <div className="h-full flex flex-col p-6 lg:p-10 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto custom-scrollbar">
+            <header className="mb-8">
+              <button
+                onClick={() => setActiveView('dashboard')}
+                className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors mb-6 group w-max"
+              >
+                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                Back to Dashboard
+              </button>
+              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 to-teal-400">
+                Playwright Recorder
+              </h2>
+              <p className="text-slate-400 mt-2">Launch a browser, discover locators, and generate Playwright test scripts.</p>
+            </header>
+
+            {/* Launch Panel */}
+            <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl mb-6">
+              <h3 className="text-lg font-medium text-slate-200 mb-4 flex items-center gap-2 pb-3 border-b border-white/5">
+                <Crosshair size={20} className="text-emerald-400" /> Launch Testing Application
+              </h3>
+              <div className="flex gap-4">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={targetUrl}
+                    onChange={(e) => setTargetUrl(e.target.value)}
+                    disabled={isSessionActive}
+                    className="w-full bg-slate-950/50 border border-white/10 hover:border-white/20 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl py-3 px-4 pl-12 text-slate-200 outline-none transition-all shadow-inner placeholder-slate-600 font-mono text-sm disabled:opacity-50"
+                    placeholder="https://your-app-url.com"
+                  />
+                  <Globe size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                </div>
+                {!isSessionActive ? (
+                  <button
+                    onClick={handleLaunchBrowser}
+                    disabled={isLaunching || !targetUrl.trim()}
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:from-slate-700 disabled:to-slate-800 disabled:text-slate-500 shadow-lg shadow-emerald-500/25 disabled:shadow-none text-white font-medium rounded-xl transition-all transform active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    {isLaunching ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
+                    Launch Browser
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleStopRecording}
+                    disabled={isStopping}
+                    className="px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/25 text-white font-medium rounded-xl transition-all transform active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    {isStopping ? <Loader2 size={18} className="animate-spin" /> : <Square size={18} />}
+                    Stop Recording
+                  </button>
+                )}
+              </div>
+
+              {/* Live Status */}
+              {isSessionActive && (
+                <div className="mt-4 flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
+                    <span className="text-emerald-300 font-medium">Recording Active</span>
+                  </div>
+                  <span className="text-slate-500">|</span>
+                  <span className="text-slate-400"><span className="text-emerald-300 font-semibold">{locators.length}</span> locators found</span>
+                  <span className="text-slate-500">|</span>
+                  <span className="text-slate-400"><span className="text-emerald-300 font-semibold">{actions.length}</span> actions recorded</span>
+                  <button onClick={pollLocators} className="ml-auto text-slate-400 hover:text-emerald-300 transition-colors" title="Refresh">
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
+              )}
+
+              {recorderError && (
+                <div className="mt-4 bg-red-950/40 border border-red-500/20 p-4 rounded-xl">
+                  <p className="text-red-400 text-sm">{recorderError}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Locators Table */}
+            {locators.length > 0 && (
+              <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl mb-6 overflow-hidden">
+                <div className="p-4 px-6 border-b border-white/5 flex justify-between items-center bg-black/20">
+                  <h3 className="font-semibold text-slate-200 flex items-center gap-2">
+                    <Crosshair size={16} className="text-emerald-400" />
+                    Discovered Locators ({locators.length})
+                  </h3>
+                </div>
+                <div className="overflow-x-auto max-h-80 overflow-y-auto custom-scrollbar">
+                  <table className="w-full text-sm">
+                    <thead className="bg-black/30 text-slate-400 uppercase tracking-wider text-xs sticky top-0">
+                      <tr>
+                        <th className="py-3 px-4 text-left">#</th>
+                        <th className="py-3 px-4 text-left">Tag</th>
+                        <th className="py-3 px-4 text-left">Strategy</th>
+                        <th className="py-3 px-4 text-left">Locator</th>
+                        <th className="py-3 px-4 text-left">Text</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {locators.map((loc, i) => (
+                        <tr key={i} className="border-t border-white/5 hover:bg-white/5 transition-colors">
+                          <td className="py-2.5 px-4 text-slate-500 font-mono">{i + 1}</td>
+                          <td className="py-2.5 px-4">
+                            <span className="bg-indigo-500/15 text-indigo-300 px-2 py-0.5 rounded text-xs font-mono">{loc.tag}</span>
+                          </td>
+                          <td className="py-2.5 px-4">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${loc.selectorType === 'data-testid' ? 'bg-emerald-500/15 text-emerald-300' :
+                              loc.selectorType === 'role' ? 'bg-purple-500/15 text-purple-300' :
+                                loc.selectorType === 'id' ? 'bg-amber-500/15 text-amber-300' :
+                                  'bg-slate-500/15 text-slate-300'
+                              }`}>{loc.selectorType}</span>
+                          </td>
+                          <td className="py-2.5 px-4 font-mono text-emerald-200 text-xs max-w-md truncate">{loc.locator}</td>
+                          <td className="py-2.5 px-4 text-slate-400 max-w-xs truncate">{loc.text || '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Actions Log */}
+            {actions.length > 0 && (
+              <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl mb-6 overflow-hidden">
+                <div className="p-4 px-6 border-b border-white/5 bg-black/20">
+                  <h3 className="font-semibold text-slate-200 flex items-center gap-2">
+                    <Code size={16} className="text-teal-400" />
+                    Recorded Actions ({actions.length})
+                  </h3>
+                </div>
+                <div className="p-4 space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                  {actions.map((action, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm bg-black/20 px-4 py-2.5 rounded-lg">
+                      <span className="text-xs text-slate-500 font-mono w-16">{new Date(action.timestamp).toLocaleTimeString()}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded font-medium ${action.type === 'navigate' ? 'bg-blue-500/15 text-blue-300' :
+                        action.type === 'page-load' ? 'bg-emerald-500/15 text-emerald-300' :
+                          'bg-purple-500/15 text-purple-300'
+                        }`}>{action.type}</span>
+                      <span className="text-slate-300 font-mono text-xs truncate">{action.target}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Generate Test Panel */}
+            {!isSessionActive && locators.length > 0 && (
+              <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl mb-6">
+                <h3 className="text-lg font-medium text-slate-200 mb-4 flex items-center gap-2 pb-3 border-b border-white/5">
+                  <Code size={20} className="text-teal-400" /> Generate Playwright Test
+                </h3>
+                <div className="flex gap-4 mb-4">
+                  <input
+                    type="text"
+                    value={testName}
+                    onChange={(e) => setTestName(e.target.value)}
+                    className="flex-1 bg-slate-950/50 border border-white/10 hover:border-white/20 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-xl py-3 px-4 text-slate-200 outline-none transition-all shadow-inner placeholder-slate-600 text-sm"
+                    placeholder="Test name..."
+                  />
+                  <button
+                    onClick={handleGenerateTest}
+                    disabled={isGeneratingTest}
+                    className="px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 shadow-lg shadow-teal-500/25 text-white font-medium rounded-xl transition-all transform active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    {isGeneratingTest ? <Loader2 size={18} className="animate-spin" /> : <Code size={18} />}
+                    Generate Test
+                  </button>
+                </div>
+
+                {generatedTestCode && (
+                  <div>
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Generated .spec.ts</span>
+                      <button
+                        onClick={downloadTestFile}
+                        className="text-sm bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-emerald-300 font-medium"
+                      >
+                        <Download size={16} /> Download
+                      </button>
+                    </div>
+                    <pre className="bg-black/40 border border-white/10 rounded-xl p-5 overflow-x-auto text-sm font-mono text-emerald-200 max-h-96 overflow-y-auto custom-scrollbar leading-relaxed">
+                      <code>{generatedTestCode}</code>
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </main>
