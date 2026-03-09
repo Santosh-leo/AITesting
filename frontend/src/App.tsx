@@ -88,7 +88,7 @@ function App() {
   };
 
   const handleGenerateScenarios = async () => {
-    if (!isSessionActive && locators.length === 0) return;
+    if (locators.length === 0 && actions.length === 0) return;
     setIsGeneratingScenarios(true);
     setRecorderError('');
     try {

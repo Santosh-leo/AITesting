@@ -63,32 +63,34 @@ const DOM_SCANNER_SCRIPT = `
         }
         // Priority 2: ARIA role + name
         else if (el.getAttribute('role') || ['button', 'a', 'input', 'textarea', 'select'].includes(tag)) {
-            const ariaLabel = el.getAttribute('aria-label');
-            const placeholder = el.getAttribute('placeholder');
-            const name = el.getAttribute('name');
+            const sanitize = (str) => (str || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').replace(/"/g, '\\"').trim();
+            const ariaLabel = sanitize(el.getAttribute('aria-label'));
+            const placeholder = sanitize(el.getAttribute('placeholder'));
+            const name = sanitize(el.getAttribute('name'));
+            const cleanText = sanitize(text);
             const roleAttr = el.getAttribute('role');
 
             if (tag === 'button' || roleAttr === 'button') {
                 selectorType = 'role';
-                locator = 'getByRole("button", { name: "' + (ariaLabel || text || 'unknown') + '" })';
+                locator = 'getByRole("button", { name: "' + (ariaLabel || cleanText || 'unknown') + '" })';
             } else if (tag === 'a' || roleAttr === 'link') {
                 selectorType = 'role';
-                locator = 'getByRole("link", { name: "' + (ariaLabel || text || 'unknown') + '" })';
+                locator = 'getByRole("link", { name: "' + (ariaLabel || cleanText || 'unknown') + '" })';
             } else if ((tag === 'input' && ['text', 'email', 'password', 'search', 'tel', 'url', ''].includes(type)) || tag === 'textarea' || roleAttr === 'textbox' || roleAttr === 'searchbox') {
                 selectorType = 'role';
                 locator = 'getByRole("textbox", { name: "' + (ariaLabel || placeholder || name || 'unknown') + '" })';
             } else if (tag === 'input' && type === 'checkbox') {
                 selectorType = 'role';
-                locator = 'getByRole("checkbox", { name: "' + (ariaLabel || text || 'unknown') + '" })';
+                locator = 'getByRole("checkbox", { name: "' + (ariaLabel || cleanText || 'unknown') + '" })';
             } else if (tag === 'input' && type === 'radio') {
                 selectorType = 'role';
-                locator = 'getByRole("radio", { name: "' + (ariaLabel || text || 'unknown') + '" })';
+                locator = 'getByRole("radio", { name: "' + (ariaLabel || cleanText || 'unknown') + '" })';
             } else if (tag === 'select' || roleAttr === 'combobox') {
                 selectorType = 'role';
                 locator = 'getByRole("combobox", { name: "' + (ariaLabel || name || 'unknown') + '" })';
             } else if (roleAttr) {
                 selectorType = 'role';
-                locator = 'getByRole("' + roleAttr + '", { name: "' + (ariaLabel || text || 'unknown') + '" })';
+                locator = 'getByRole("' + roleAttr + '", { name: "' + (ariaLabel || cleanText || 'unknown') + '" })';
             }
         }
 
