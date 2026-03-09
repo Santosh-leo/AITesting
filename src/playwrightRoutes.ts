@@ -176,9 +176,10 @@ router.post('/launch', async (req: Request, res: Response) => {
 
         console.log(`[Playwright] Launching Chromium and navigating to: ${url}`);
 
-        // Launch browser in headed mode so the user can interact
+        // Launch the user's installed Chrome browser in headed mode
         browser = await chromium.launch({
             headless: false,
+            channel: 'chrome',
             args: ['--start-maximized']
         });
 

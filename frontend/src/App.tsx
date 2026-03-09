@@ -292,7 +292,7 @@ function App() {
               <span className="hidden lg:block font-medium">Settings</span>
             </button>
             <button
-              onClick={() => setActiveView('recorder')}
+              onClick={() => { setActiveView('recorder'); if (!isSessionActive && !isLaunching && targetUrl.trim()) handleLaunchBrowser(); }}
               className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 lg:px-4 rounded-xl transition-all duration-200 ${activeView === 'recorder'
                 ? 'bg-emerald-500/15 text-emerald-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] border border-emerald-500/20'
                 : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
