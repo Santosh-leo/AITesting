@@ -58,7 +58,55 @@ function App() {
   const [generatedTestCode, setGeneratedTestCode] = useState('');
   const [recorderError, setRecorderError] = useState('');
   const [testName, setTestName] = useState('Recorded Navigation Test');
+  const [isGeneratingScenarios, setIsGeneratingScenarios] = useState(false);
+  const [generatedScenarios, setGeneratedScenarios] = useState<{ n: string; reqId: string; objective: string; steps: string; expected: string }[]>([]);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const parseScenarios = (content: string) => {
+    const scenarios: any[] = [];
+    const items = content.split(/N:\s*(?=\d+)/g);
+
+    items.forEach(item => {
+      if (!item.trim()) return;
+      const nMatch = item.match(/^(\d+)/);
+      const reqIdMatch = item.match(/Req ID:\s*([^\n]*)/);
+      const objMatch = item.match(/Test Objective:\s*([^\n]*)/);
+      const stepsMatch = item.match(/Test Steps:\s*([\s\S]*?)(?=Expected Result:|$)/);
+      const expectedMatch = item.match(/Expected Result:\s*([\s\S]*?)(?=$)/);
+
+      if (nMatch || reqIdMatch || objMatch) {
+        scenarios.push({
+          n: (nMatch ? nMatch[1] : '').trim(),
+          reqId: (reqIdMatch ? reqIdMatch[1] : '').trim(),
+          objective: (objMatch ? objMatch[1] : '').trim(),
+          steps: (stepsMatch ? stepsMatch[1] : '').trim(),
+          expected: (expectedMatch ? expectedMatch[1] : '').trim(),
+        });
+      }
+    });
+    return scenarios;
+  };
+
+  const handleGenerateScenarios = async () => {
+    if (!isSessionActive && locators.length === 0) return;
+    setIsGeneratingScenarios(true);
+    setRecorderError('');
+    try {
+      const res = await axios.post('http://localhost:3000/api/playwright/generate-scenarios', {
+        provider,
+        model,
+        apiUrl,
+        apiKey
+      });
+      const parsed = parseScenarios(res.data.scenarios);
+      setGeneratedScenarios(parsed);
+    } catch (err: any) {
+      setRecorderError(err.response?.data?.error || err.message);
+    } finally {
+      setIsGeneratingScenarios(false);
+    }
+  };
+
 
   // Poll for locators while recording
   const pollLocators = useCallback(async () => {
@@ -83,6 +131,7 @@ function App() {
     setIsLaunching(true);
     setRecorderError('');
     setGeneratedTestCode('');
+    setGeneratedScenarios([]);
     setLocators([]);
     setActions([]);
     try {
@@ -813,6 +862,59 @@ function App() {
                     <pre className="bg-black/40 border border-white/10 rounded-xl p-5 overflow-x-auto text-sm font-mono text-emerald-200 max-h-96 overflow-y-auto custom-scrollbar leading-relaxed">
                       <code>{generatedTestCode}</code>
                     </pre>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Test Cases Scenarios UI */}
+            {(!isSessionActive && (locators.length > 0 || actions.length > 0)) && (
+              <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl">
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+                  <h3 className="text-lg font-medium text-slate-200 flex items-center gap-2">
+                    <Sparkles size={20} className="text-indigo-400" /> Test Cases (Positive & Negative)
+                  </h3>
+                  <button
+                    onClick={handleGenerateScenarios}
+                    disabled={isGeneratingScenarios}
+                    className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-sm font-medium rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-500/20"
+                  >
+                    {isGeneratingScenarios ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                    {generatedScenarios.length > 0 ? 'Regenerate Scenarios' : 'Generate Test Cases'}
+                  </button>
+                </div>
+
+                {generatedScenarios.length > 0 ? (
+                  <div className="overflow-x-auto rounded-xl border border-white/5">
+                    <table className="w-full text-sm">
+                      <thead className="bg-black/40 text-slate-400 uppercase text-xs tracking-wider">
+                        <tr>
+                          <th className="py-3 px-4 text-left border-r border-white/5">Req ID</th>
+                          <th className="py-3 px-4 text-left border-r border-white/5">Objective</th>
+                          <th className="py-3 px-4 text-left border-r border-white/5">Test Steps (with Locators)</th>
+                          <th className="py-3 px-4 text-left">Expected Result</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {generatedScenarios.map((sc, i) => (
+                          <tr key={i} className="hover:bg-white/5 transition-colors">
+                            <td className="py-4 px-4 font-mono text-indigo-300 border-r border-white/5">{sc.reqId}</td>
+                            <td className="py-4 px-4 text-slate-200 border-r border-white/5 font-medium">{sc.objective}</td>
+                            <td className="py-4 px-4 text-slate-400 border-r border-white/5 whitespace-pre-wrap leading-relaxed">{sc.steps}</td>
+                            <td className="py-4 px-4 text-emerald-400/90 leading-relaxed font-medium">{sc.expected}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-2xl bg-black/10">
+                    <div className="p-4 bg-indigo-500/10 rounded-full mb-4">
+                      <FileJson size={32} className="text-indigo-400 opacity-50" />
+                    </div>
+                    <p className="text-slate-500 text-center max-w-sm">
+                      {isGeneratingScenarios ? 'Analyzing recorded session...' : 'Click "Generate Test Cases" to have the LLM analyze your session and create positive & negative test scenarios.'}
+                    </p>
                   </div>
                 )}
               </div>

@@ -386,4 +386,84 @@ router.post('/generate-test', async (req: Request, res: Response) => {
     }
 });
 
+// ─── Route: Generate High-Level Test Scenarios (Positive/Negative) ──────
+router.post('/generate-scenarios', async (req: Request, res: Response) => {
+    try {
+        const { provider, model, apiUrl, apiKey } = req.body;
+
+        if (!provider || !model || !apiUrl) {
+            res.status(400).json({ error: 'LLM settings (provider, model, apiUrl) are required' });
+            return;
+        }
+
+        if (recordedActions.length === 0 && discoveredLocators.length === 0) {
+            res.status(400).json({ error: 'No recorded actions or locators. Launch and navigate a site first.' });
+            return;
+        }
+
+        // Build a detailed prompt for the LLM
+        const locatorsList = discoveredLocators.map(l => `- Tag: ${l.tag}, Locator: ${l.locator}, Text: "${l.text}"`).join('\n');
+        const actionsList = recordedActions.map(a => `- ${a.type} ${a.target || ''} ${a.value ? '(value: ' + a.value + ')' : ''}`).join('\n');
+
+        const prompt = `You are an expert Automation Architect. Based on the following recorded session and discovered locators, generate at least 3 Positive and 3 Negative test cases.
+Each test case must include:
+1. N (Number)
+2. Req ID (e.g., REQ-001)
+3. Test Objective
+4. Test Steps (Mention the specifically discovered locators like getByRole... or getByTestId...)
+5. Expected Result
+
+RECORDED SESSION:
+${actionsList}
+
+DISCOVERED LOCATORS:
+${locatorsList}
+
+CRITICAL: Output the test cases strictly in the following format:
+- N: 
+- Req ID: 
+- Test Objective: 
+- Test Steps:
+- Expected Result:
+
+Separate Positive and Negative sections clearly. Do not include any other text.`;
+
+        let generatedScenarios = '';
+
+        // Call LLM (Duplicate logic from llmRoutes for standalone functionality)
+        if (provider === 'ollama') {
+            const ollamaResponse = await fetch(`${apiUrl.replace(/\/$/, "")}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model, prompt, stream: false })
+            });
+            if (!ollamaResponse.ok) throw new Error(`Ollama Error: ${ollamaResponse.statusText}`);
+            const data = await ollamaResponse.json();
+            generatedScenarios = data.response;
+        } else {
+            const llmResponse = await fetch(`${apiUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {})
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [{ role: 'system', content: 'You are a QA automation expert.' }, { role: 'user', content: prompt }],
+                    temperature: 0.7
+                })
+            });
+            if (!llmResponse.ok) throw new Error(`LLM Error: ${llmResponse.statusText}`);
+            const data = await llmResponse.json();
+            generatedScenarios = data.choices[0].message.content;
+        }
+
+        res.json({ scenarios: generatedScenarios });
+
+    } catch (error: any) {
+        console.error('[Playwright] Scenario generation error:', error);
+        res.status(500).json({ error: error.message || 'Failed to generate test scenarios' });
+    }
+});
+
 export default router;
