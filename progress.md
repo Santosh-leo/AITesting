@@ -14,7 +14,7 @@
 - Compiled backend and frontend successfully.
 
 ## Errors
-- Noted that a `design` folder was mentioned but does not exist yet in the repository.
+- ~~Noted that a `design` folder was mentioned but does not exist yet in the repository.~~ **Resolved** — `Design` folder copied into project from `C:\Users\SANTOSH\AITesterLearning\Design` and committed to the repository.
 
 ## Tests & Results
 - Verified creation of frontend React application.
