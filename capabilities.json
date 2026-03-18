@@ -1,0 +1,22 @@
+{
+    "android": {
+        "browserName": "Chrome",
+        "appium:deviceName": "Android Device",
+        "appium:platformVersion": "15",
+        "appium:automationName": "UiAutomator2",
+        "appium:udid": "auto",
+        "appium:avd": "Medium_Phone_API_36.1"
+    },
+    "ios": {
+        "appium:app": "/path/to/your/ios/app.ipa",
+        "appium:deviceName": "iPhone 15 Pro",
+        "appium:platformVersion": "17.0",
+        "appium:automationName": "XCUITest",
+        "appium:udid": "your-device-udid"
+    },
+    "general": {
+        "platformName": "mac",
+        "appium:automationName": "mac2",
+        "appium:bundleId": "com.apple.Safari"
+    }
+}

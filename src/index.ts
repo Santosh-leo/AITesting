@@ -5,6 +5,8 @@ import llmRoutes from './llmRoutes';
 import playwrightRoutes from './playwrightRoutes';
 import jiraRoutes from './jiraRoutes';
 import salesforceTestRoutes from './salesforceTestRoutes';
+import dashboardRoutes from './dashboardRoutes';
+
 
 dotenv.config();
 
@@ -23,7 +25,13 @@ app.use('/api', llmRoutes);
 app.use('/api/playwright', playwrightRoutes);
 app.use('/api/jira', jiraRoutes);
 app.use('/api/sf-autotest', salesforceTestRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
+
+export default app;

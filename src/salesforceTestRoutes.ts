@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import { chromium, Browser, Page, BrowserContext } from 'playwright';
 import dotenv from 'dotenv';
+import { saveTestResult } from './dashboardRoutes';
+
 
 dotenv.config();
 
@@ -321,12 +323,20 @@ router.post('/run', async (req: Request, res: Response) => {
         await testBrowser.close().catch(() => {});
         testBrowser = null;
 
+        // Save to Dashboard
+        try {
+            saveTestResult(summary);
+        } catch (saveErr) {
+            console.error('[SF-AutoTest] Failed to save result to dashboard', saveErr);
+        }
+
         res.json({
             testSteps,
             results,
             defects,
             summary
         });
+
 
     } catch (error: any) {
         console.error('[SF-AutoTest] Error:', error);

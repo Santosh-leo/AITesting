@@ -209,6 +209,10 @@ router.post('/create-defect', async (req: Request, res: Response) => {
 
         const { projectKey, summary, description, linkedStoryKey, screenshotBase64 } = req.body;
 
+        console.log(`[Jira] Creating defect request for project: ${projectKey}, summary: ${summary}`);
+        if (linkedStoryKey) console.log(`[Jira] Linked Story: ${linkedStoryKey}`);
+        if (screenshotBase64) console.log(`[Jira] Screenshot provided (length: ${screenshotBase64.length})`);
+
         if (!projectKey || !summary) {
             res.status(400).json({ error: 'projectKey and summary are required.' });
             return;
@@ -261,7 +265,7 @@ router.post('/create-defect', async (req: Request, res: Response) => {
 
         const createdIssue = await createResponse.json();
         const createdKey = createdIssue.key;
-        console.log(`[Jira] Bug created: ${createdKey}`);
+        console.log(`[Jira] Bug created successfully: ${createdKey}`);
 
         // Step 2: Link to parent story if provided
         if (linkedStoryKey) {

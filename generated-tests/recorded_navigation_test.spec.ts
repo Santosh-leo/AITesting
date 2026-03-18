@@ -22,7 +22,7 @@ test('Recorded Navigation Test', async ({ page }) => {
   await expect(page.getByRole("button", { name: /shortcuts/i })).toBeVisible();
   await expect(page.getByRole("link", { name: "Amazon", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Deliver to/i })).toBeVisible();
-  await expect(page.getByRole("combobox", { name: /All Departments/i || "url" })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: /All Departments/i })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Search Amazon" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Choose a language/i })).toBeVisible();
 

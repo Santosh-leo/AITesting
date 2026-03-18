@@ -1,0 +1,53 @@
+[
+  {
+    "id": "run_1",
+    "timestamp": "2026-03-15T18:30:11.789Z",
+    "totalSteps": 10,
+    "passed": 8,
+    "failed": 2,
+    "skipped": 0,
+    "passRate": 80,
+    "defectsFound": 1
+  },
+  {
+    "id": "run_2",
+    "timestamp": "2026-03-16T10:30:11.798Z",
+    "totalSteps": 15,
+    "passed": 14,
+    "failed": 1,
+    "skipped": 0,
+    "passRate": 93,
+    "defectsFound": 0
+  },
+  {
+    "id": "run_3",
+    "timestamp": "2026-03-16T14:45:11.798Z",
+    "totalSteps": 12,
+    "passed": 10,
+    "failed": 2,
+    "skipped": 0,
+    "passRate": 83,
+    "defectsFound": 1
+  },
+  {
+    "id": "run_4",
+    "timestamp": "2026-03-17T09:15:11.798Z",
+    "totalSteps": 20,
+    "passed": 19,
+    "failed": 1,
+    "skipped": 0,
+    "passRate": 95,
+    "defectsFound": 0
+  },
+  {
+    "id": "run_1773686888111",
+    "timestamp": "2026-03-16T18:48:08.111Z",
+    "totalSteps": 11,
+    "passed": 6,
+    "failed": 5,
+    "skipped": 0,
+    "passRate": 55,
+    "defectsFound": 5,
+    "executedAt": "2026-03-16T18:48:06.531Z"
+  }
+]
