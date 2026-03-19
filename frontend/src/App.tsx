@@ -492,7 +492,6 @@ function App() {
 
     setIsGenerating(true);
     setError('');
-    setActiveTab('output');
 
     try {
       const formData = new FormData();
@@ -660,6 +659,43 @@ function App() {
         </div>
       </nav>
 
+      {/* Mobile Navigation Drawer */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-[110] md:hidden">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)}></div>
+          <div className="absolute right-0 top-0 h-full w-64 bg-[#1a1a45] shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+              <span className="text-white font-bold text-lg">Menu</span>
+              <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-white">
+                <X size={22} />
+              </button>
+            </div>
+            <div className="flex flex-col py-4">
+              {[
+                { id: 'home', label: 'Home' },
+                { id: 'analytics', label: 'Dashboard' },
+                { id: 'testBuilder', label: 'Test Builder' },
+                { id: 'recorder', label: 'Recorder' },
+                { id: 'automatedTesting', label: 'Auto Test' },
+                { id: 'settings', label: 'Settings' }
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveView(item.id as View); setIsSidebarOpen(false); }}
+                  className={`px-6 py-3.5 text-left text-sm font-medium transition-colors ${
+                    activeView === item.id
+                      ? 'text-cyan-400 bg-white/5 border-r-2 border-cyan-400'
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area */}
       <main className="flex-1 relative z-10 flex flex-col">
         {activeView === 'home' ? (
@@ -668,11 +704,11 @@ function App() {
             {/* Hero Section */}
             <section className="py-20 px-6 lg:px-12 max-w-7xl mx-auto w-full">
               <div className="text-center mb-16">
-                <h2 className="text-5xl lg:text-7xl font-extrabold text-[#1a1a45] mb-6 leading-tight">
+                <h2 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold text-[#1a1a45] mb-6 leading-tight">
                   Test Automation and <br/>
                   <span className="text-cyan-600">Reporting System</span>
                 </h2>
-                <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
                   T.A.R.S is an intelligent reporting and automation suite designed to streamline your QA workflow with AI-powered test generation and live recording.
                 </p>
               </div>
@@ -697,9 +733,21 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-yellow-400/10 rounded-3xl blur-2xl group-hover:bg-yellow-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 flex items-center justify-center">
-                        <LayoutDashboard size={64} className="text-cyan-400 opacity-50" />
-                        <span className="absolute bottom-4 right-4 bg-cyan-500 text-white text-[10px] px-2 py-1 rounded font-bold">PREVIEW</span>
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
+                        <video
+                          src="/videos/dashboard-preview.mp4"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                        />
+                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
+                          <LayoutDashboard size={64} className="text-cyan-400 opacity-50" />
+                          <span className="text-cyan-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
+                        </div>
+                        <span className="absolute bottom-4 right-4 bg-cyan-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
                       </div>
                     </div>
                   </div>
@@ -723,9 +771,21 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-purple-400/10 rounded-3xl blur-2xl group-hover:bg-purple-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 flex items-center justify-center">
-                        <Sparkles size={64} className="text-purple-400 opacity-50" />
-                        <span className="absolute bottom-4 right-4 bg-purple-500 text-white text-[10px] px-2 py-1 rounded font-bold">PREVIEW</span>
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
+                        <video
+                          src="/videos/testbuilder-preview.mp4"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                        />
+                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
+                          <Sparkles size={64} className="text-purple-400 opacity-50" />
+                          <span className="text-purple-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
+                        </div>
+                        <span className="absolute bottom-4 right-4 bg-purple-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
                       </div>
                     </div>
                   </div>
@@ -749,9 +809,21 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-emerald-400/10 rounded-3xl blur-2xl group-hover:bg-emerald-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 flex items-center justify-center">
-                        <Play size={64} className="text-emerald-400 opacity-50" />
-                        <span className="absolute bottom-4 right-4 bg-emerald-500 text-white text-[10px] px-2 py-1 rounded font-bold">PREVIEW</span>
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
+                        <video
+                          src="/videos/recorder-preview.mp4"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                        />
+                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
+                          <Play size={64} className="text-emerald-400 opacity-50" />
+                          <span className="text-emerald-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
+                        </div>
+                        <span className="absolute bottom-4 right-4 bg-emerald-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
                       </div>
                     </div>
                   </div>
@@ -775,9 +847,21 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-amber-400/10 rounded-3xl blur-2xl group-hover:bg-amber-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 flex items-center justify-center">
-                        <Activity size={64} className="text-amber-400 opacity-50" />
-                        <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[10px] px-2 py-1 rounded font-bold">PREVIEW</span>
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
+                        <video
+                          src="/videos/autotest-preview.mp4"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                        />
+                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
+                          <Activity size={64} className="text-amber-400 opacity-50" />
+                          <span className="text-amber-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
+                        </div>
+                        <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
                       </div>
                     </div>
                   </div>
@@ -964,47 +1048,41 @@ function App() {
           </div>
         ) : activeView === 'testBuilder' ? (
 
-          <div className="flex-1 flex flex-col p-4 md:p-6 lg:p-10 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <header className="mb-8 flex justify-between items-end">
+          <div className="flex-1 flex flex-col p-4 md:p-6 lg:p-10 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <header className="mb-6 flex justify-between items-end">
               <div>
                 <h2 className="text-3xl font-bold text-slate-900">
-                  Manual Test case Generator
+                  Manual Test Case Generator
                 </h2>
                 <p className="text-slate-400 mt-2">Generate comprehensive tests from your Jira specs or screenshots.</p>
               </div>
             </header>
 
-            <div className="flex flex-col sm:flex-row items-center gap-2 mb-6 bg-slate-200/50 p-1.5 rounded-xl w-full sm:w-max border border-slate-300 backdrop-blur-md">
-              <button
-                className={`w-full sm:w-auto px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${activeTab === 'input' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-slate-200'}`}
-                onClick={() => setActiveTab('input')}
-              >
-                1. Input Specifications
-              </button>
-              <button
-                className={`w-full sm:w-auto px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${activeTab === 'output' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-400 hover:text-slate-200'}`}
-                onClick={() => setActiveTab('output')}
-              >
-                2. Generated Tests
-              </button>
-            </div>
-
-            {/* Input Tab */}
-            {activeTab === 'input' && (
-              <div className="flex-1 flex flex-col bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden relative">
+            {/* Split-Screen Layout */}
+            <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+              {/* Left Panel – Input */}
+              <div className="w-full lg:w-[45%] flex flex-col bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden relative">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
-                <div className="flex-1 p-8 overflow-y-auto w-full max-w-4xl mx-auto">
+                <div className="p-4 px-6 border-b border-slate-200 bg-slate-50/50 backdrop-blur-md">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-indigo-100 p-2 rounded-lg">
+                      <Send size={18} className="text-indigo-600" />
+                    </div>
+                    <h3 className="font-bold text-slate-900 tracking-wide">Input Specifications</h3>
+                  </div>
+                </div>
+                <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
 
-                  <div className="flex gap-4 mb-8">
+                  <div className="flex gap-4 mb-6">
                     <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full h-10 w-10 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20">
                       <Bot size={20} className="text-white" />
                     </div>
-                    <div className="bg-slate-100/80 border border-slate-200 p-5 rounded-2xl rounded-tl-none shadow-sm backdrop-blur-md">
-                      <p className="text-slate-800 leading-relaxed text-sm lg:text-base mb-3 font-medium">
-                        Ready for input. Paste your Jira user story or acceptance criteria below. You can also upload a reference screenshot (App Design or ER Diagram).
+                    <div className="bg-slate-100/80 border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm backdrop-blur-md">
+                      <p className="text-slate-800 leading-relaxed text-sm mb-2 font-medium">
+                        Paste your Jira user story or acceptance criteria below. You can also upload a reference screenshot.
                       </p>
                       <p className="text-indigo-600 text-xs italic font-semibold">
-                        Ensure you select a Vision model in settings (e.g., llava, gpt-4o, claude-3) if uploading images.
+                        Select a Vision model in settings if uploading images.
                       </p>
                     </div>
                   </div>
@@ -1026,8 +1104,8 @@ function App() {
 
                 </div>
 
-                <div className="p-6 bg-slate-50/80 border-t border-slate-200 backdrop-blur-md">
-                  <div className="max-w-4xl mx-auto flex gap-4">
+                <div className="p-4 bg-slate-50/80 border-t border-slate-200 backdrop-blur-md">
+                  <div className="flex gap-3">
                     {/* File Upload Button */}
                     <div className="flex items-center justify-center self-end mb-1 relative shrink-0">
                       <input
@@ -1039,10 +1117,10 @@ function App() {
                       />
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-4 bg-white border border-slate-200 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 rounded-xl transition-all duration-300 shadow-sm hover:border-indigo-300 group"
+                        className="p-3 bg-white border border-slate-200 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 rounded-xl transition-all duration-300 shadow-sm hover:border-indigo-300 group"
                         title="Upload Screenshot"
                       >
-                        <ImageIcon size={24} className="group-hover:scale-110 transition-transform" />
+                        <ImageIcon size={20} className="group-hover:scale-110 transition-transform" />
                       </button>
                     </div>
 
@@ -1051,70 +1129,68 @@ function App() {
                       <textarea
                         value={jiraRequirement}
                         onChange={(e) => setJiraRequirement(e.target.value)}
-                        className="w-full bg-white border border-slate-200 group-focus-within:border-indigo-500 rounded-xl py-4 px-5 pr-16 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 resize-none text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-300"
-                        placeholder="e.g. As a user, I want to securely log into the portal so I can access my dashboard..."
+                        className="w-full bg-white border border-slate-200 group-focus-within:border-indigo-500 rounded-xl py-3 px-4 pr-14 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 resize-none text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-300 text-sm"
+                        placeholder="e.g. As a user, I want to securely log into the portal..."
                         rows={3}
                       />
                       <button
                         onClick={handleGenerate}
                         disabled={isGenerating || (!jiraRequirement.trim() && !imageFile)}
-                        className="absolute right-4 bottom-4 p-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-300 shadow-lg shadow-indigo-500/20 disabled:shadow-none flex items-center justify-center transform hover:-translate-y-0.5 active:translate-y-0"
+                        className="absolute right-3 bottom-3 p-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-300 shadow-lg shadow-indigo-500/20 disabled:shadow-none flex items-center justify-center transform hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        {isGenerating ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+                        {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* Output Tab */}
-            {activeTab === 'output' && (
-              <div className="flex-1 flex flex-col bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden relative">
+              {/* Right Panel – Output */}
+              <div className="w-full lg:w-[55%] flex flex-col bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden relative min-h-[400px]">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent"></div>
 
-                <div className="p-4 px-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50 backdrop-blur-md z-10">
+                <div className="p-4 px-6 border-b border-slate-200 flex flex-wrap justify-between items-center bg-slate-50/50 backdrop-blur-md z-10 gap-2">
                   <div className="flex items-center gap-3">
                     <div className="bg-indigo-100 p-2 rounded-lg">
                       <FileJson size={18} className="text-indigo-600" />
                     </div>
-                    <h2 className="font-bold text-slate-900 tracking-wide">Test Results</h2>
+                    <h3 className="font-bold text-slate-900 tracking-wide">Generated Tests</h3>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       disabled={!generatedTests}
                       onClick={() => navigator.clipboard.writeText(generatedTests)}
-                      className="text-sm bg-white hover:bg-slate-50 border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 text-slate-700 font-bold shadow-sm"
+                      className="text-sm bg-white hover:bg-slate-50 border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all duration-200 text-slate-700 font-bold shadow-sm"
                       title="Copy Markdown"
                     >
-                      <CheckCircle size={16} className={generatedTests ? "text-emerald-500" : "text-slate-400"} />
+                      <CheckCircle size={14} className={generatedTests ? "text-emerald-500" : "text-slate-400"} />
                     </button>
                     <button
                       disabled={!generatedTests}
                       onClick={exportToExcel}
-                      className="text-sm bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 text-indigo-700 font-bold shadow-sm"
+                      className="text-sm bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all duration-200 text-indigo-700 font-bold shadow-sm"
                     >
-                      <Download size={16} /> Excel
+                      <Download size={14} /> Excel
                     </button>
                     <button
                       disabled={!generatedTests}
                       onClick={exportToWord}
-                      className="text-sm bg-purple-50 hover:bg-purple-100 border border-purple-200 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 text-purple-700 font-bold shadow-sm"
+                      className="text-sm bg-purple-50 hover:bg-purple-100 border border-purple-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all duration-200 text-purple-700 font-bold shadow-sm"
                     >
-                      <Download size={16} /> Word
+                      <Download size={14} /> Word
                     </button>
                     <button
                       disabled={!generatedTests}
                       onClick={handleOpenJiraModal}
-                      className="text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 text-blue-700 font-bold shadow-sm"
+                      className="text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all duration-200 text-blue-700 font-bold shadow-sm"
                     >
-                      <Upload size={16} /> Upload to Jira
+                      <Upload size={14} /> Jira
                     </button>
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar relative">
                   {isGenerating ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-indigo-600 gap-6 bg-white/80 backdrop-blur-sm">
                       <div className="relative">
@@ -1137,7 +1213,7 @@ function App() {
                         <h3 className="text-xl font-bold mb-2 text-red-900">Generation Failed</h3>
                         <p className="text-red-700 leading-relaxed font-medium">{error}</p>
                         <button
-                          onClick={() => setActiveTab('input')}
+                          onClick={() => setError('')}
                           className="mt-6 px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-red-500/20"
                         >
                           Try Again
@@ -1259,7 +1335,7 @@ function App() {
                           </table>
                         </div>
                       ) : (
-                        <div className="max-w-4xl mx-auto prose prose-slate max-w-none
+                        <div className="prose prose-slate max-w-none
                             prose-headings:text-slate-900 prose-headings:font-bold 
                             prose-a:text-indigo-600 hover:prose-a:text-indigo-500
                             prose-pre:bg-slate-50 prose-pre:border prose-pre:border-slate-200 prose-pre:shadow-sm
@@ -1279,7 +1355,7 @@ function App() {
                   )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         ) : activeView === 'settings' ? (
           /* Settings View */
@@ -1418,7 +1494,7 @@ function App() {
               <h3 className="text-lg font-medium text-slate-800 mb-4 flex items-center gap-2 pb-3 border-b border-slate-200">
                 <Crosshair size={20} className="text-emerald-600" /> Launch Testing Application
               </h3>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -1474,6 +1550,31 @@ function App() {
                 </div>
               )}
             </div>
+
+            {/* Embedded Browser View */}
+            {isSessionActive && (
+              <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl mb-6 overflow-hidden">
+                <div className="p-3 px-6 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
+                    <span className="text-sm font-bold text-slate-800">Live Browser Preview</span>
+                    <span className="text-xs text-slate-400 font-mono truncate max-w-xs">{targetUrl}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border border-emerald-200">Recording</span>
+                  </div>
+                </div>
+                <div className="relative" style={{ height: '500px' }}>
+                  <iframe
+                    src={targetUrl}
+                    className="w-full h-full border-0"
+                    title="Browser Preview"
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                  />
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900/20 to-transparent h-8 pointer-events-none"></div>
+                </div>
+              </div>
+            )}
 
             {/* Locators Table */}
             {locators.length > 0 && (
@@ -1643,8 +1744,8 @@ function App() {
           </div>
         ) : activeView === 'automatedTesting' ? (
           /* Automated Testing View */
-          <div className="flex-1 overflow-hidden relative flex flex-col p-4 md:p-6 lg:p-10 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <header className="mb-8 flex justify-between items-end">
+          <div className="flex-1 overflow-hidden relative flex flex-col p-4 md:p-6 lg:p-10 max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <header className="mb-6 flex justify-between items-end">
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                   <Activity size={32} className="text-amber-500" /> Automated Salesforce Testing
@@ -1653,26 +1754,35 @@ function App() {
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
-
-              {autoTestPhase === 'input' && (
-                <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
-                  <h3 className="text-lg font-medium text-slate-800 mb-4 flex items-center gap-2">
-                    <Briefcase size={20} className="text-amber-600" /> What do you want to test?
-                  </h3>
+            {/* Split-Screen Layout */}
+            <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+              {/* Left Panel – Input (always visible) */}
+              <div className="w-full lg:w-[40%] flex flex-col">
+                <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl p-6 flex flex-col h-full">
+                  <div className="p-4 px-0 border-b border-slate-100 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-amber-100 p-2 rounded-lg">
+                        <Briefcase size={18} className="text-amber-600" />
+                      </div>
+                      <h3 className="font-bold text-slate-900 tracking-wide">Test Configuration</h3>
+                    </div>
+                  </div>
+                  <h4 className="text-sm font-medium text-slate-700 mb-3 flex items-center gap-2">
+                    What do you want to test?
+                  </h4>
                   <textarea
                     value={sfUserStory}
                     onChange={(e) => setSfUserStory(e.target.value)}
-                    placeholder="Enter a Salesforce User Story or functional requirement.&#10;For example: 'As a Sales Rep, I want to navigate to the Accounts tab, click New, fill in the Account Name as Target Corp, and click Save.'"
-                    className="w-full bg-slate-50 border border-slate-200 hover:border-amber-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl py-4 px-5 text-slate-900 outline-none transition-all shadow-inner placeholder-slate-400 min-h-[160px] resize-y mb-6"
+                    placeholder={"Enter a Salesforce User Story or functional requirement.\nFor example: 'As a Sales Rep, I want to navigate to the Accounts tab, click New, fill in the Account Name as Target Corp, and click Save.'"}
+                    className="w-full bg-slate-50 border border-slate-200 hover:border-amber-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl py-4 px-5 text-slate-900 outline-none transition-all shadow-inner placeholder-slate-400 min-h-[160px] resize-y mb-4 flex-1 text-sm"
                   />
 
                   {autoRunError && (
-                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
-                      <AlertCircle size={20} className="text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                      <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-red-200">Execution Failed</p>
-                        <p className="text-xs text-red-400/80 mt-1">{autoRunError}</p>
+                        <p className="text-sm font-medium text-red-800">Execution Failed</p>
+                        <p className="text-xs text-red-600 mt-1">{autoRunError}</p>
                       </div>
                     </div>
                   )}
@@ -1684,170 +1794,172 @@ function App() {
                       className="px-8 py-3.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-lg shadow-amber-500/25 text-white font-medium rounded-xl transition-all transform active:scale-95 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <PlayCircle size={20} />
-                      Generate & Run Tests
+                      {isAutoRunning ? 'Running...' : 'Generate & Run Tests'}
                     </button>
                   </div>
                 </div>
-              )}
+              </div>
 
-              {autoTestPhase === 'running' && (
-                <div className="flex flex-col items-center justify-center h-full text-slate-300 min-h-[400px]">
-                  <div className="relative mb-8">
-                    <div className="absolute -inset-4 bg-amber-500/20 rounded-full blur-xl animate-pulse"></div>
-                    <Loader2 size={64} className="text-amber-400 animate-spin relative z-10" />
+              {/* Right Panel – Results */}
+              <div className="w-full lg:w-[60%] flex flex-col min-h-[400px]">
+                {autoTestPhase === 'input' && !autoTestSummary ? (
+                  <div className="flex-1 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl flex flex-col items-center justify-center text-slate-500 gap-4 p-8">
+                    <div className="bg-slate-100 p-8 rounded-full border border-slate-200 shadow-inner">
+                      <Activity size={48} className="text-slate-400" />
+                    </div>
+                    <p className="text-xl font-bold text-slate-900">No test results yet.</p>
+                    <p className="text-sm text-slate-500 text-center max-w-sm">Enter a user story on the left and click "Generate & Run Tests" to start automated testing.</p>
                   </div>
-                  <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-orange-300 mb-3">
-                    Executing Automated Tests
-                  </h3>
-                  <p className="text-slate-400 text-center max-w-md">
-                    Please hold on. The LLM is generating test steps, logging into Salesforce, and running playbooks live in a background Chromium instance...
-                  </p>
-
-                  <div className="mt-12 w-full max-w-sm flex flex-col gap-4">
-                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500 w-1/2 animate-pulse rounded-full"></div>
+                ) : autoTestPhase === 'running' ? (
+                  <div className="flex-1 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl flex flex-col items-center justify-center text-slate-300">
+                    <div className="relative mb-8">
+                      <div className="absolute -inset-4 bg-amber-500/20 rounded-full blur-xl animate-pulse"></div>
+                      <Loader2 size={64} className="text-amber-400 animate-spin relative z-10" />
                     </div>
-                    <div className="flex justify-between text-xs text-slate-500 font-mono">
-                      <span>Working...</span>
-                      <span>~30-60s</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {autoTestPhase === 'results' && autoTestSummary && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-
-                  {/* Summary Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-                      <span className="text-slate-500 text-sm font-medium">Total Steps</span>
-                      <span className="text-3xl font-bold text-slate-900 mt-2">{autoTestSummary.totalSteps}</span>
-                    </div>
-                    <div className="bg-emerald-50/50 backdrop-blur-xl border border-emerald-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-                      <span className="text-emerald-700 text-sm font-medium">Passed</span>
-                      <span className="text-3xl font-bold text-emerald-600 mt-2">{autoTestSummary.passed}</span>
-                    </div>
-                    <div className="bg-red-50/50 backdrop-blur-xl border border-red-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-                      <span className="text-red-700 text-sm font-medium">Failed / Defects</span>
-                      <span className="text-3xl font-bold text-red-600 mt-2">{autoTestSummary.failed}</span>
-                    </div>
-                    <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-                      <span className="text-slate-500 text-sm font-medium">Pass Rate</span>
-                      <span className="text-3xl font-bold text-amber-600 mt-2">{autoTestSummary.passRate}%</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col lg:flex-row gap-6 h-auto lg:h-[500px]">
-                    {/* Results Table */}
-                    <div className="flex-1 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden">
-                      <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
-                        <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                          <ClipboardList size={18} className="text-amber-600" />
-                          Execution Log
-                        </h3>
-                        <button
-                          onClick={() => setAutoTestPhase('input')}
-                          className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg transition-colors text-slate-300"
-                        >
-                          New Run
-                        </button>
+                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500 mb-3">
+                      Executing Automated Tests
+                    </h3>
+                    <p className="text-slate-400 text-center max-w-md">
+                      The LLM is generating test steps and running them live in a background Chromium instance...
+                    </p>
+                    <div className="mt-12 w-full max-w-sm flex flex-col gap-4 px-8">
+                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500 w-1/2 animate-pulse rounded-full"></div>
                       </div>
-                      <div className="flex-1 overflow-y-auto custom-scrollbar">
-                        <table className="w-full text-sm">
-                          <thead className="bg-slate-100/80 text-slate-500 uppercase text-xs tracking-wider sticky top-0 z-10">
-                            <tr>
-                              <th className="py-3 px-4 text-left border-r border-slate-200 w-12">#</th>
-                              <th className="py-3 px-4 text-left border-r border-slate-200">Step Description</th>
-                              <th className="py-3 px-4 text-left border-r border-slate-200 w-24">Action</th>
-                              <th className="py-3 px-4 text-left border-r border-slate-200 w-24">Status</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-white/5">
-                            {autoTestResults.map((r, i) => (
-                              <tr key={i} className="hover:bg-white/5 transition-colors">
-                                <td className="py-3 px-4 border-r border-white/5 text-slate-500 font-mono text-xs">{r.stepId}</td>
-                                <td className="py-3 px-4 border-r border-white/5">
-                                  <span className="text-slate-200 font-medium block mb-1">{r.description}</span>
-                                  <span className="text-slate-500 font-mono text-xs block">{r.target}</span>
-                                  {r.error && <span className="text-red-400/90 text-xs mt-1 block">{r.error}</span>}
-                                </td>
-                                <td className="py-3 px-4 border-r border-white/5 text-xs font-mono text-slate-400">{r.action.toUpperCase()}</td>
-                                <td className="py-3 px-4 border-r border-white/5">
-                                  <span className={`px-2.5 py-1 rounded text-xs font-medium ${r.status === 'pass' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20' :
-                                      r.status === 'fail' ? 'bg-red-500/15 text-red-300 border border-red-500/20' :
-                                        'bg-slate-500/15 text-slate-300'
-                                    }`}>
-                                    {r.status.toUpperCase()}
-                                  </span>
-                                </td>
+                      <div className="flex justify-between text-xs text-slate-500 font-mono">
+                        <span>Working...</span>
+                        <span>~30-60s</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : autoTestPhase === 'results' && autoTestSummary ? (
+                  <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 animate-in fade-in slide-in-from-bottom-4">
+
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                        <span className="text-slate-500 text-sm font-medium">Total Steps</span>
+                        <span className="text-3xl font-bold text-slate-900 mt-2">{autoTestSummary.totalSteps}</span>
+                      </div>
+                      <div className="bg-emerald-50/50 backdrop-blur-xl border border-emerald-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                        <span className="text-emerald-700 text-sm font-medium">Passed</span>
+                        <span className="text-3xl font-bold text-emerald-600 mt-2">{autoTestSummary.passed}</span>
+                      </div>
+                      <div className="bg-red-50/50 backdrop-blur-xl border border-red-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                        <span className="text-red-700 text-sm font-medium">Failed / Defects</span>
+                        <span className="text-3xl font-bold text-red-600 mt-2">{autoTestSummary.failed}</span>
+                      </div>
+                      <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                        <span className="text-slate-500 text-sm font-medium">Pass Rate</span>
+                        <span className="text-3xl font-bold text-amber-600 mt-2">{autoTestSummary.passRate}%</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row gap-6 h-auto lg:h-[500px]">
+                      {/* Results Table */}
+                      <div className="flex-1 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden">
+                        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
+                          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                            <ClipboardList size={18} className="text-amber-600" />
+                            Execution Log
+                          </h3>
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar">
+                          <table className="w-full text-sm">
+                            <thead className="bg-slate-100/80 text-slate-500 uppercase text-xs tracking-wider sticky top-0 z-10">
+                              <tr>
+                                <th className="py-3 px-4 text-left border-r border-slate-200 w-12">#</th>
+                                <th className="py-3 px-4 text-left border-r border-slate-200">Step Description</th>
+                                <th className="py-3 px-4 text-left border-r border-slate-200 w-24">Action</th>
+                                <th className="py-3 px-4 text-left border-r border-slate-200 w-24">Status</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {autoTestResults.map((r, i) => (
+                                <tr key={i} className="hover:bg-slate-50 transition-colors">
+                                  <td className="py-3 px-4 border-r border-slate-100 text-slate-500 font-mono text-xs">{r.stepId}</td>
+                                  <td className="py-3 px-4 border-r border-slate-100">
+                                    <span className="text-slate-800 font-medium block mb-1">{r.description}</span>
+                                    <span className="text-slate-500 font-mono text-xs block">{r.target}</span>
+                                    {r.error && <span className="text-red-500 text-xs mt-1 block">{r.error}</span>}
+                                  </td>
+                                  <td className="py-3 px-4 border-r border-slate-100 text-xs font-mono text-slate-400">{r.action.toUpperCase()}</td>
+                                  <td className="py-3 px-4 border-r border-slate-100">
+                                    <span className={`px-2.5 py-1 rounded text-xs font-medium ${r.status === 'pass' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
+                                        r.status === 'fail' ? 'bg-red-100 text-red-700 border border-red-200' :
+                                          'bg-slate-100 text-slate-500'
+                                      }`}>
+                                      {r.status.toUpperCase()}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Defects Panel */}
-                    <div className="w-full lg:w-1/3 min-w-0 lg:min-w-[320px] bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden h-[400px] lg:h-auto">
-                      <div className="p-4 border-b border-slate-200 bg-slate-50/50">
-                        <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                          <Bug size={18} className="text-red-500" />
-                          Defects ({autoTestDefects.length})
-                        </h3>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                        {autoTestDefects.length === 0 ? (
-                          <div className="h-full flex flex-col items-center justify-center text-emerald-500/70 p-6 text-center">
-                            <CheckSquare size={48} className="mb-4 text-emerald-500/50" />
-                            <p className="text-sm font-medium">All tests passed successfully.</p>
-                            <p className="text-xs mt-1">No defects were found during execution.</p>
-                          </div>
-                        ) : (
-                          autoTestDefects.map((defect) => (
-                            <div key={defect.id} className="bg-red-50/50 border border-red-200 rounded-xl overflow-hidden shadow-lg group">
-                              <div className="p-3 bg-red-100/50 border-b border-red-200 flex justify-between items-center">
-                                <span className="text-xs font-semibold text-red-700 tracking-wider">DEFECT #{defect.id}</span>
-                                <span className="text-xs text-red-600/70 font-mono">Step {defect.stepId}</span>
-                              </div>
-                              <div className="p-4">
-                                <p className="text-sm text-slate-800 font-medium mb-2">{defect.description}</p>
-                                <p className="text-xs text-slate-500 font-mono bg-slate-100 p-2 rounded mb-3 truncate" title={defect.error}>
-                                  {defect.error}
-                                </p>
-
-                                {defect.screenshotBase64 && (
-                                  <div className="mb-4 relative rounded-lg overflow-hidden border border-slate-200 group-hover:border-slate-300 transition-colors">
-                                    <div className="absolute top-2 left-2 bg-white/80 px-2 py-1 flex items-center gap-1 rounded text-[10px] text-slate-900 backdrop-blur-md shadow-sm">
-                                      <Camera size={12} /> Failure Screenshot
-                                    </div>
-                                    <img
-                                      src={`data:image/png;base64,${defect.screenshotBase64}`}
-                                      alt="Failure state"
-                                      className="w-full h-auto cursor-pointer hover:scale-105 transition-transform duration-500"
-                                      onClick={() => setExpandedImage(`data:image/png;base64,${defect.screenshotBase64}`)}
-                                    />
-                                  </div>
-                                )}
-
-                                <button
-                                  onClick={() => setDefectToReport(defect)}
-                                  className="w-full py-2 bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-300 text-sm font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
-                                >
-                                  <Upload size={14} /> Report to Jira
-                                </button>
-                              </div>
+                      {/* Defects Panel */}
+                      <div className="w-full lg:w-1/3 min-w-0 lg:min-w-[320px] bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden h-[400px] lg:h-auto">
+                        <div className="p-4 border-b border-slate-200 bg-slate-50/50">
+                          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                            <Bug size={18} className="text-red-500" />
+                            Defects ({autoTestDefects.length})
+                          </h3>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                          {autoTestDefects.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-emerald-500/70 p-6 text-center">
+                              <CheckSquare size={48} className="mb-4 text-emerald-500/50" />
+                              <p className="text-sm font-medium">All tests passed successfully.</p>
+                              <p className="text-xs mt-1">No defects were found during execution.</p>
                             </div>
-                          ))
-                        )}
+                          ) : (
+                            autoTestDefects.map((defect) => (
+                              <div key={defect.id} className="bg-red-50/50 border border-red-200 rounded-xl overflow-hidden shadow-lg group">
+                                <div className="p-3 bg-red-100/50 border-b border-red-200 flex justify-between items-center">
+                                  <span className="text-xs font-semibold text-red-700 tracking-wider">DEFECT #{defect.id}</span>
+                                  <span className="text-xs text-red-600/70 font-mono">Step {defect.stepId}</span>
+                                </div>
+                                <div className="p-4">
+                                  <p className="text-sm text-slate-800 font-medium mb-2">{defect.description}</p>
+                                  <p className="text-xs text-slate-500 font-mono bg-slate-100 p-2 rounded mb-3 truncate" title={defect.error}>
+                                    {defect.error}
+                                  </p>
+
+                                  {defect.screenshotBase64 && (
+                                    <div className="mb-4 relative rounded-lg overflow-hidden border border-slate-200 group-hover:border-slate-300 transition-colors">
+                                      <div className="absolute top-2 left-2 bg-white/80 px-2 py-1 flex items-center gap-1 rounded text-[10px] text-slate-900 backdrop-blur-md shadow-sm">
+                                        <Camera size={12} /> Failure Screenshot
+                                      </div>
+                                      <img
+                                        src={`data:image/png;base64,${defect.screenshotBase64}`}
+                                        alt="Failure state"
+                                        className="w-full h-auto cursor-pointer hover:scale-105 transition-transform duration-500"
+                                        onClick={() => setExpandedImage(`data:image/png;base64,${defect.screenshotBase64}`)}
+                                      />
+                                    </div>
+                                  )}
+
+                                  <button
+                                    onClick={() => setDefectToReport(defect)}
+                                    className="w-full py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-sm font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
+                                  >
+                                    <Upload size={14} /> Report to Jira
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                ) : null}
               </div>
             </div>
-          ) : null}
+          </div>
+        ) : null}
         </div>
       )}
     </main>
