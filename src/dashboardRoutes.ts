@@ -70,21 +70,27 @@ router.get('/stats', (req: Request, res: Response) => {
     }
 });
 
-// Save a new test run (internal use or API)
 export const saveTestResult = (summary: any) => {
-    ensureDataDir();
-    const data = fs.readFileSync(DATA_FILE, 'utf-8');
-    const results: TestRunSummary[] = JSON.parse(data);
-    
-    const newRun: TestRunSummary = {
-        id: `run_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        ...summary
-    };
-    
-    results.push(newRun);
-    fs.writeFileSync(DATA_FILE, JSON.stringify(results, null, 2), 'utf-8');
-    return newRun;
+    try {
+        ensureDataDir();
+        if (fs.existsSync(DATA_FILE)) {
+            const data = fs.readFileSync(DATA_FILE, 'utf-8');
+            const results: TestRunSummary[] = JSON.parse(data);
+            
+            const newRun: TestRunSummary = {
+                id: `run_${Date.now()}`,
+                timestamp: new Date().toISOString(),
+                ...summary
+            };
+            
+            results.push(newRun);
+            fs.writeFileSync(DATA_FILE, JSON.stringify(results, null, 2), 'utf-8');
+            return newRun;
+        }
+    } catch (error) {
+        console.error('Failed to save test result (likely read-only FS):', error);
+    }
+    return null;
 };
 
 export default router;

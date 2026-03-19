@@ -917,7 +917,7 @@ function App() {
                   </button>
                 </div>
               </div>
-            ) : !dashboardData || dashboardData.totalRuns === 0 ? (
+            ) : !dashboardData || dashboardData?.totalRuns === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-slate-500 gap-4">
                 <div className="bg-slate-100 p-8 rounded-full border border-slate-200 shadow-inner">
                   <Activity size={48} className="text-slate-400" />
@@ -931,19 +931,19 @@ function App() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <div className="bg-white/80 backdrop-blur-xl border border-slate-200 p-6 rounded-2xl shadow-xl hover:border-slate-300 transition-all">
                     <p className="text-slate-500 text-sm font-semibold uppercase tracking-wider">Total Runs</p>
-                    <p className="text-4xl font-bold text-slate-900 mt-2">{dashboardData.totalRuns}</p>
+                    <p className="text-4xl font-bold text-slate-900 mt-2">{dashboardData?.totalRuns || 0}</p>
                   </div>
                   <div className="bg-emerald-50/50 backdrop-blur-xl border border-emerald-200 p-6 rounded-2xl shadow-xl">
                     <p className="text-emerald-700 text-sm font-semibold uppercase tracking-wider">Avg Pass Rate</p>
-                    <p className="text-4xl font-bold text-emerald-600 mt-2">{dashboardData.overallPassRate}%</p>
+                    <p className="text-4xl font-bold text-emerald-600 mt-2">{dashboardData?.overallPassRate || 0}%</p>
                   </div>
                   <div className="bg-indigo-50/50 backdrop-blur-xl border border-indigo-200 p-6 rounded-2xl shadow-xl">
                     <p className="text-indigo-700 text-sm font-semibold uppercase tracking-wider">Total Passed</p>
-                    <p className="text-4xl font-bold text-indigo-600 mt-2">{dashboardData.distribution.passed}</p>
+                    <p className="text-4xl font-bold text-indigo-600 mt-2">{dashboardData?.distribution?.passed || 0}</p>
                   </div>
                   <div className="bg-red-50/50 backdrop-blur-xl border border-red-200 p-6 rounded-2xl shadow-xl">
                     <p className="text-red-700 text-sm font-semibold uppercase tracking-wider">Total Failed</p>
-                    <p className="text-4xl font-bold text-red-600 mt-2">{dashboardData.distribution.failed}</p>
+                    <p className="text-4xl font-bold text-red-600 mt-2">{dashboardData?.distribution?.failed || 0}</p>
                   </div>
                 </div>
 
@@ -953,7 +953,7 @@ function App() {
                     <h3 className="text-lg font-bold text-slate-900 mb-6">Execution Pass Rate Trend</h3>
                     <div className="flex-1">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={dashboardData.historicalData}>
+                        <LineChart data={dashboardData?.historicalData || []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
                           <XAxis dataKey="timestamp" stroke="#64748b" fontSize={10} tickFormatter={(val) => val.split(' ')[0]} />
                           <YAxis stroke="#64748b" fontSize={10} domain={[0, 100]} />
@@ -972,7 +972,7 @@ function App() {
                     <h3 className="text-lg font-bold text-slate-900 mb-6">Step Outcomes per Run</h3>
                     <div className="flex-1">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={dashboardData.historicalData}>
+                        <BarChart data={dashboardData?.historicalData || []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
                           <XAxis dataKey="timestamp" stroke="#64748b" fontSize={10} tickFormatter={(val) => val.split(' ')[0]} />
                           <YAxis stroke="#64748b" fontSize={10} />
@@ -995,8 +995,8 @@ function App() {
                         <PieChart>
                           <Pie
                             data={[
-                              { name: 'Passed', value: dashboardData.distribution.passed },
-                              { name: 'Failed', value: dashboardData.distribution.failed }
+                              { name: 'Passed', value: dashboardData?.distribution?.passed || 0 },
+                              { name: 'Failed', value: dashboardData?.distribution?.failed || 0 }
                             ]}
                             cx="50%"
                             cy="50%"
@@ -1839,19 +1839,19 @@ function App() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
                         <span className="text-slate-500 text-sm font-medium">Total Steps</span>
-                        <span className="text-3xl font-bold text-slate-900 mt-2">{autoTestSummary.totalSteps}</span>
+                        <span className="text-3xl font-bold text-slate-900 mt-2">{autoTestSummary?.totalSteps || 0}</span>
                       </div>
                       <div className="bg-emerald-50/50 backdrop-blur-xl border border-emerald-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
                         <span className="text-emerald-700 text-sm font-medium">Passed</span>
-                        <span className="text-3xl font-bold text-emerald-600 mt-2">{autoTestSummary.passed}</span>
+                        <span className="text-3xl font-bold text-emerald-600 mt-2">{autoTestSummary?.passed || 0}</span>
                       </div>
                       <div className="bg-red-50/50 backdrop-blur-xl border border-red-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
                         <span className="text-red-700 text-sm font-medium">Failed / Defects</span>
-                        <span className="text-3xl font-bold text-red-600 mt-2">{autoTestSummary.failed}</span>
+                        <span className="text-3xl font-bold text-red-600 mt-2">{autoTestSummary?.failed || 0}</span>
                       </div>
                       <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
                         <span className="text-slate-500 text-sm font-medium">Pass Rate</span>
-                        <span className="text-3xl font-bold text-amber-600 mt-2">{autoTestSummary.passRate}%</span>
+                        <span className="text-3xl font-bold text-amber-600 mt-2">{autoTestSummary?.passRate || 0}%</span>
                       </div>
                     </div>
 
