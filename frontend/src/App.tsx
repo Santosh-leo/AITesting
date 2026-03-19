@@ -733,21 +733,14 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-yellow-400/10 rounded-3xl blur-2xl group-hover:bg-yellow-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
-                        <video
-                          src="/videos/dashboard-preview.mp4"
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative group/img">
+                        <img 
+                          src="/images/dashboard-live.png" 
+                          alt="Quality Insights Dashboard"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
                         />
-                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
-                          <LayoutDashboard size={64} className="text-cyan-400 opacity-50" />
-                          <span className="text-cyan-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
-                        </div>
-                        <span className="absolute bottom-4 right-4 bg-cyan-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-500"></div>
+                        <span className="absolute bottom-4 right-4 bg-cyan-500 text-white text-[10px] px-2 py-1 rounded font-bold shadow-lg shadow-cyan-500/50">LIVE PREVIEW</span>
                       </div>
                     </div>
                   </div>
@@ -771,21 +764,14 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-purple-400/10 rounded-3xl blur-2xl group-hover:bg-purple-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
-                        <video
-                          src="/videos/testbuilder-preview.mp4"
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative group/img">
+                        <img 
+                          src="/images/testbuilder-live.png" 
+                          alt="AI Test Case Builder"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
                         />
-                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
-                          <Sparkles size={64} className="text-purple-400 opacity-50" />
-                          <span className="text-purple-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
-                        </div>
-                        <span className="absolute bottom-4 right-4 bg-purple-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-500"></div>
+                        <span className="absolute bottom-4 right-4 bg-purple-500 text-white text-[10px] px-2 py-1 rounded font-bold shadow-lg shadow-purple-500/50">LIVE PREVIEW</span>
                       </div>
                     </div>
                   </div>
@@ -809,21 +795,14 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-emerald-400/10 rounded-3xl blur-2xl group-hover:bg-emerald-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
-                        <video
-                          src="/videos/recorder-preview.mp4"
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative group/img">
+                        <img 
+                          src="/images/recorder-live.png" 
+                          alt="Interactive Recorder"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
                         />
-                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
-                          <Play size={64} className="text-emerald-400 opacity-50" />
-                          <span className="text-emerald-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
-                        </div>
-                        <span className="absolute bottom-4 right-4 bg-emerald-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-500"></div>
+                        <span className="absolute bottom-4 right-4 bg-emerald-500 text-white text-[10px] px-2 py-1 rounded font-bold shadow-lg shadow-emerald-500/50">LIVE PREVIEW</span>
                       </div>
                     </div>
                   </div>
@@ -847,21 +826,14 @@ function App() {
                   <div className="flex-1 relative group">
                     <div className="absolute -inset-4 bg-amber-400/10 rounded-3xl blur-2xl group-hover:bg-amber-400/20 transition-all"></div>
                     <div className="relative bg-slate-100 rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-hidden">
-                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative">
-                        <video
-                          src="/videos/autotest-preview.mp4"
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLVideoElement).style.display = 'none'; (e.target as HTMLVideoElement).nextElementSibling?.classList.remove('hidden'); }}
+                      <div className="aspect-video bg-indigo-950 rounded-xl overflow-hidden relative group/img">
+                        <img 
+                          src="/images/autotest-live.png" 
+                          alt="Automated Suite"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
                         />
-                        <div className="hidden absolute inset-0 flex flex-col items-center justify-center gap-3">
-                          <Activity size={64} className="text-amber-400 opacity-50" />
-                          <span className="text-amber-400/60 text-xs font-bold uppercase tracking-widest">Video Coming Soon</span>
-                        </div>
-                        <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[10px] px-2 py-1 rounded font-bold">LIVE DEMO</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-500"></div>
+                        <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[10px] px-2 py-1 rounded font-bold shadow-lg shadow-amber-500/50">LIVE PREVIEW</span>
                       </div>
                     </div>
                   </div>

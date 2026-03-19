@@ -60,5 +60,16 @@
     "passRate": 50,
     "defectsFound": 3,
     "executedAt": "2026-03-19T16:00:02.937Z"
+  },
+  {
+    "id": "run_1773942204100",
+    "timestamp": "2026-03-19T17:43:24.101Z",
+    "totalSteps": 5,
+    "passed": 3,
+    "failed": 2,
+    "skipped": 0,
+    "passRate": 60,
+    "defectsFound": 2,
+    "executedAt": "2026-03-19T17:43:16.466Z"
   }
 ]
